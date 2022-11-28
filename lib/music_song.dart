@@ -137,9 +137,6 @@ class _MusicSongsState extends State<MusicSongs> {
                                       fontWeight: FontWeight.bold),
                                   textAlign: TextAlign.start),
                             ),
-                            const SizedBox(
-                              height: 10,
-                            ),
                           ],
                         ),
                       ),
