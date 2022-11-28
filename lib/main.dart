@@ -48,28 +48,30 @@ class _MyHomePageState extends State<MyHomePage> {
   bool isSyncLock = false;
 
   _musicListFunction() {
-    DataConnectionStatus status = internetCheck();
-    if (status == DataConnectionStatus.connected) {
-      setState(() {
-        isLoading = true;
-      });
-      musixMatch().then((value) {
-        if (value.message!.header!.statusCode == 200) {
-          setState(() {
-            musicList = value.message!.body!.trackList!;
-          });
-        }
+    // DataConnectionStatus status = internetCheck();
+    // if (status == DataConnectionStatus.connected) {
+    //
+    // } else {
+    //   return showDialog(
+    //       context: context,
+    //       builder: (BuildContext) => AlertDialog(
+    //             title: Text("NO INTERNET CONNECTION"),
+    //           ));
+    // }
+
+    setState(() {
+      isLoading = true;
+    });
+    musixMatch().then((value) {
+      if (value.message!.header!.statusCode == 200) {
         setState(() {
-          isLoading = false;
+          musicList = value.message!.body!.trackList!;
         });
+      }
+      setState(() {
+        isLoading = false;
       });
-    } else {
-      return showDialog(
-          context: context,
-          builder: (BuildContext) => AlertDialog(
-                title: Text("NO INTERNET CONNECTION"),
-              ));
-    }
+    });
   }
 
   @override
