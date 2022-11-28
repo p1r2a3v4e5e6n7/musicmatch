@@ -40,6 +40,8 @@ dependencies:
   genius_lyrics: ^0.0.9
   flutter_lyric: ^2.0.4+6
   url_launcher: ^6.1.7
+  toast: ^0.1.4
+  data_connection_checker: ^0.3.4
 
 dev_dependencies:
   flutter_test:

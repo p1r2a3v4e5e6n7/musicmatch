@@ -1,4 +1,5 @@
-import 'package:flutter/cupertino.dart';
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:musicapp/repository_api/repository_musiclist.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -37,17 +38,21 @@ class _MusicSongsState extends State<MusicSongs> {
   }
 
   songFunction() {
-    setState(() {
-      isLoading = true;
-    });
-    songsMusic(trackId!).then((value) {
-      if (value.message!.header!.statusCode == 200) {
-        setState(() {});
-      }
+    try {
       setState(() {
-        isLoading = false;
+        isLoading = true;
       });
-    });
+      songsMusic(trackId!).then((value) {
+        if (value.message!.header!.statusCode == 200) {
+          setState(() {});
+        }
+        setState(() {
+          isLoading = false;
+        });
+      });
+    } on SocketException catch (e) {
+      // toast('No internet connection');
+    }
   }
 
   lyricsFunction() {

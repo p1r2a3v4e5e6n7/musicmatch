@@ -1,4 +1,8 @@
+import 'dart:io';
+
+import 'package:data_connection_checker/data_connection_checker.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:musicapp/music_song.dart';
 import 'package:musicapp/repository_api/repository_musiclist.dart';
 
@@ -44,25 +48,72 @@ class _MyHomePageState extends State<MyHomePage> {
   bool isSyncLock = false;
 
   _musicListFunction() {
-    setState(() {
-      isLoading = true;
-    });
-    musixMatch().then((value) {
-      if (value.message!.header!.statusCode == 200) {
-        setState(() {
-          musicList = value.message!.body!.trackList!;
-        });
-      }
+    DataConnectionStatus status = internetCheck();
+    if (status == DataConnectionStatus.connected) {
       setState(() {
-        isLoading = false;
+        isLoading = true;
       });
-    });
+      musixMatch().then((value) {
+        if (value.message!.header!.statusCode == 200) {
+          setState(() {
+            musicList = value.message!.body!.trackList!;
+          });
+        }
+        setState(() {
+          isLoading = false;
+        });
+      });
+    } else {
+      return showDialog(
+          context: context,
+          builder: (BuildContext) => AlertDialog(
+                title: Text("NO INTERNET CONNECTION"),
+              ));
+    }
   }
 
   @override
   void initState() {
     _musicListFunction();
+
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+  }
+
+  internetCheck() async {
+    print("The statement 'this machine is connected to the Internet' is: ");
+    print(await DataConnectionChecker().hasConnection);
+    // returns a bool
+
+    // We can also get an enum instead of a bool
+    print("Current status: ${await DataConnectionChecker().connectionStatus}");
+    // prints either DataConnectionStatus.connected
+    // or DataConnectionStatus.disconnected
+
+    // This returns the last results from the last call
+    // to either hasConnection or connectionStatus
+    print("Last results: ${DataConnectionChecker().lastTryResults}");
+
+    // actively listen for status updates
+    var listener = DataConnectionChecker().onStatusChange.listen((status) {
+      switch (status) {
+        case DataConnectionStatus.connected:
+          print('Data connection is available.');
+          break;
+        case DataConnectionStatus.disconnected:
+          print('You are disconnected from the internet.');
+          break;
+      }
+    });
+
+    // close listener after 30 seconds, so the program doesn't run forever
+    await Future.delayed(Duration(seconds: 30));
+    await listener.cancel();
+    return DataConnectionChecker().connectionStatus;
   }
 
   @override
